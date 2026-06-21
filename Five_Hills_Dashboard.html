@@ -1,0 +1,2723 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Five Hills — لوحة تحليل أداء الحملات الإعلانية</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #c29b38; /* Real estate gold */
+            --primary-glow: rgba(194, 155, 56, 0.3);
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.2);
+            --accent-red: #ef4444;
+            --accent-red-glow: rgba(239, 68, 68, 0.2);
+            --accent-blue: #0ea5e9;
+            --accent-blue-glow: rgba(14, 165, 233, 0.2);
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #b58d24;
+            --primary-glow: rgba(181, 141, 36, 0.15);
+            --accent-green: #059669;
+            --accent-green-glow: rgba(5, 150, 105, 0.1);
+            --accent-red: #dc2626;
+            --accent-red-glow: rgba(220, 38, 38, 0.1);
+            --accent-blue: #0284c7;
+            --accent-blue-glow: rgba(2, 132, 199, 0.1);
+            --card-shadow: 0 8px 32px 0 rgba(148, 163, 184, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dynamic Font & Alignment based on dir */
+        [dir="rtl"] * {
+            font-family: 'Tajawal', sans-serif;
+        }
+        [dir="ltr"] * {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), #e2b84f);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .logo-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: #0f172a;
+        }
+
+        .title-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to left, var(--text-main), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #e2b84f);
+            color: #0f172a;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(194, 155, 56, 0.5);
+        }
+
+        /* Top Metrics Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Directional Indicator Borders in Metric Cards */
+        [dir="rtl"] .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        [dir="ltr"] .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        [dir="rtl"] .metric-card.accent-green::before { background: var(--accent-green); }
+        [dir="ltr"] .metric-card.accent-green::before { background: var(--accent-green); }
+
+        [dir="rtl"] .metric-card.accent-blue::before { background: var(--accent-blue); }
+        [dir="ltr"] .metric-card.accent-blue::before { background: var(--accent-blue); }
+
+        [dir="rtl"] .metric-card.accent-red::before { background: var(--accent-red); }
+        [dir="ltr"] .metric-card.accent-red::before { background: var(--accent-red); }
+
+        .metric-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: 'Outfit', 'Tajawal', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+        }
+
+        .metric-value span.unit {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .metric-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .metric-sub.up { color: var(--accent-green); }
+        .metric-sub.down { color: var(--accent-red); }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--card-bg);
+            padding: 0.4rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none; /* Safari and Chrome */
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-color);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-main);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Layout Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 900px) {
+            .content-grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .content-grid-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .content-grid-3-2 {
+                grid-template-columns: 3fr 2fr;
+            }
+            .content-grid-2-3 {
+                grid-template-columns: 2fr 3fr;
+            }
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--text-main);
+        }
+
+        .card-title svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Dynamic directional borders for strategic cards */
+        [dir="rtl"] .card-strength { border-right: 4px solid var(--accent-green); }
+        [dir="ltr"] .card-strength { border-left: 4px solid var(--accent-green); }
+
+        [dir="rtl"] .card-weakness { border-right: 4px solid var(--accent-red); }
+        [dir="ltr"] .card-weakness { border-left: 4px solid var(--accent-red); }
+
+        [dir="rtl"] .card-conclusion { border-right: 4px solid var(--primary); }
+        [dir="ltr"] .card-conclusion { border-left: 4px solid var(--primary); }
+
+        .conclusion-box {
+            background: var(--primary-glow);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        [dir="rtl"] .conclusion-box { border-right: 4px solid var(--primary); }
+        [dir="ltr"] .conclusion-box { border-left: 4px solid var(--primary); }
+
+        /* Tables and Alignment */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+            margin-top: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        [dir="rtl"] table {
+            text-align: right;
+        }
+        [dir="ltr"] table {
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.15);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Dynamic status chips */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-green { background: var(--accent-green-glow); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-yellow { background: var(--primary-glow); color: var(--primary); border: 1px solid rgba(194, 155, 56, 0.3); }
+        .badge-red { background: var(--accent-red-glow); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-blue { background: var(--accent-blue-glow); color: var(--accent-blue); border: 1px solid rgba(14, 165, 233, 0.3); }
+
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            margin-top: 1rem;
+        }
+
+        /* Lists and Checkboxes */
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+        }
+
+        .checklist-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .checklist-content {
+            flex-grow: 1;
+        }
+
+        .checklist-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .checklist-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .strengths-grid, .weaknesses-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .strengths-grid, .weaknesses-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .point-card {
+            padding: 1.2rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        [dir="rtl"] .point-card.strength { border-right: 4px solid var(--accent-green); border-left: none; }
+        [dir="ltr"] .point-card.strength { border-left: 4px solid var(--accent-green); border-right: none; }
+
+        [dir="rtl"] .point-card.weakness { border-right: 4px solid var(--accent-red); border-left: none; }
+        [dir="ltr"] .point-card.weakness { border-left: 4px solid var(--accent-red); border-right: none; }
+
+        .point-icon {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .point-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        /* Number formatted text */
+        .number-outfit {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Responsive Text Align */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+
+        /* Print formatting */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .card {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+                margin-bottom: 20px !important;
+                padding: 15px !important;
+            }
+            .tab-content {
+                display: block !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                margin-bottom: 30px !important;
+            }
+            .tab-title-print {
+                display: block !important;
+                font-size: 1.5rem;
+                font-weight: 800;
+                margin-top: 30px;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+                color: #000 !important;
+                page-break-before: always;
+            }
+            .tab-title-print:first-of-type {
+                page-break-before: avoid;
+            }
+            th {
+                background: #f1f5f9 !important;
+                color: #000000 !important;
+                border-bottom: 2px solid #cbd5e1 !important;
+            }
+            td {
+                color: #000000 !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+            }
+            .metric-card {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            .metric-value {
+                color: #000000 !important;
+            }
+            .badge {
+                border: 1px solid #000 !important;
+                color: #000 !important;
+                background: transparent !important;
+            }
+            .checklist-item {
+                background: transparent !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            .point-card {
+                background: transparent !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            [dir="rtl"] .point-card.strength { border-right: 4px solid #059669 !important; border-left: none !important; }
+            [dir="ltr"] .point-card.strength { border-left: 4px solid #059669 !important; border-right: none !important; }
+            [dir="rtl"] .point-card.weakness { border-right: 4px solid #dc2626 !important; border-left: none !important; }
+            [dir="ltr"] .point-card.weakness { border-left: 4px solid #dc2626 !important; border-right: none !important; }
+        }
+
+        .tab-title-print {
+            display: none;
+        }
+
+        /* Mobile optimization styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                gap: 1rem;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            .btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+                flex-grow: 1;
+                justify-content: center;
+            }
+            .title-text h1 {
+                font-size: 1.4rem;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                margin-bottom: 1.5rem;
+            }
+            .metric-card {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            .metric-value {
+                font-size: 1.3rem;
+            }
+            .metric-title {
+                font-size: 0.75rem;
+            }
+            .metric-sub {
+                font-size: 0.7rem;
+            }
+            .tabs {
+                margin-bottom: 1.5rem;
+                padding: 0.25rem;
+            }
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+            .card {
+                padding: 1.2rem;
+                border-radius: 12px;
+                margin-bottom: 1.2rem;
+            }
+            .card-title {
+                font-size: 1.05rem;
+            }
+            .chart-container {
+                height: 240px;
+            }
+            table {
+                font-size: 0.8rem;
+            }
+            th, td {
+                padding: 0.6rem 0.8rem;
+            }
+            .strengths-grid, .weaknesses-grid {
+                grid-template-columns: 1fr;
+            }
+            .point-card {
+                padding: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                </div>
+                <div class="title-text">
+                    <h1 data-i18n="logoTitle">Five Hills Real Estate — العقارات</h1>
+                    <p data-i18n="logoSub">تقرير تحليل أداء التسويق الرقمي | 1 — 21 يونيو 2026</p>
+                </div>
+            </div>
+            
+            <div class="header-actions no-print">
+                <button class="btn" id="lang-toggle">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span id="lang-text">English</span>
+                </button>
+                <button class="btn" id="theme-toggle">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="theme-icon">
+                        <!-- Dark mode icon path by default -->
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <span id="theme-text" data-i18n="themeLight">الوضع المضيء</span>
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-12 0v5h12v-5"></path>
+                    </svg>
+                    <span data-i18n="printBtn">طباعة التقرير / حفظ PDF</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Metrics cards (Total Overview) -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title" data-i18n="metricSpendTitle">إجمالي الميزانية المنفقة</div>
+                <div class="metric-value">
+                    <span class="number-outfit" id="metric-spend">241.49</span>
+                    <span class="unit" data-i18n="metricSpendUnit">د.إ</span>
+                </div>
+                <div class="metric-sub" data-i18n="metricSpendSub">خلال 21 يوماً (بمعدل ~11.5 د.إ يومياً)</div>
+            </div>
+            <div class="metric-card accent-green">
+                <div class="metric-title" data-i18n="metricLeadsTitle">المحادثات المستلمة (Leads)</div>
+                <div class="metric-value">
+                    <span class="number-outfit" id="metric-leads">30</span>
+                    <span class="unit" data-i18n="metricLeadsUnit">محادثة</span>
+                </div>
+                <div class="metric-sub up" data-i18n="metricLeadsSub">
+                    حملة First Ad Month 6
+                </div>
+            </div>
+            <div class="metric-card accent-blue">
+                <div class="metric-title" data-i18n="metricViewsTitle">مشاهدات الصفحة العضوية</div>
+                <div class="metric-value">
+                    <span class="number-outfit" id="metric-views">10,056</span>
+                    <span class="unit" data-i18n="metricViewsUnit">مشاهدة</span>
+                </div>
+                <div class="metric-sub up" data-i18n="metricViewsSub">
+                    <span class="number-outfit">+1,543%</span> نمو بالآخر 28 يوماً
+                </div>
+            </div>
+            <div class="metric-card accent-blue">
+                <div class="metric-title" data-i18n="metricFollowersTitle">عدد متابعي الصفحة الكلي</div>
+                <div class="metric-value">
+                    <span class="number-outfit" id="metric-followers">189</span>
+                    <span class="unit" data-i18n="metricFollowersUnit">متابع</span>
+                </div>
+                <div class="metric-sub up" data-i18n="metricFollowersSub">
+                    <span class="number-outfit">+2,600%</span> نمو متسارع
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs no-print">
+            <button class="tab-btn active" data-tab="tab-overview" data-i18n="tabOverview">
+                📊 الملخص التنفيذي
+            </button>
+            <button class="tab-btn" data-tab="tab-paid" data-i18n="tabPaid">
+                🎯 الحملات المدفوعة
+            </button>
+            <button class="tab-btn" data-tab="tab-organic" data-i18n="tabOrganic">
+                📱 الأداء العضوي
+            </button>
+            <button class="tab-btn" data-tab="tab-analysis" data-i18n="tabAnalysis">
+                🔍 نقاط القوة والضعف
+            </button>
+            <button class="tab-btn" data-tab="tab-roadmap" data-i18n="tabRoadmap">
+                🚀 خطة العمل والتوصيات
+            </button>
+        </div>
+
+        <!-- TAB CONTENT 1: OVERVIEW -->
+        <h2 class="tab-title-print" data-i18n="printOverview">📊 الملخص التنفيذي ونظرة عامة</h2>
+        <div id="tab-overview" class="tab-content active">
+            <div class="content-grid content-grid-3-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                            <span data-i18n="cardExecSummary">الملخص التنفيذي</span>
+                        </h3>
+                    </div>
+                    <div id="executive-summary-text">
+                        <!-- Dynamic text loaded from JSON -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                            <span data-i18n="cardBudgetShare">توزيع الميزانية والنتائج</span>
+                        </h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="budgetShareChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" data-i18n="cardCampaignsSummary">أداء الحملات الرئيسي</h3>
+                    <span class="card-subtitle" data-i18n="cardCampaignsSummarySub">مقارنة سريعة بين أهداف وإنفاق الحملات</span>
+                </div>
+                <div class="table-responsive">
+                    <table id="table-campaigns-summary">
+                        <thead>
+                            <tr>
+                                <th data-i18n="thCampaign">الحملة</th>
+                                <th data-i18n="thObjective">الهدف</th>
+                                <th data-i18n="thSpend">الإنفاق</th>
+                                <th data-i18n="thResults">النتائج</th>
+                                <th data-i18n="thCostResult">تكلفة النتيجة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loaded from JSON -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" data-i18n="cardPaidOverview">نظرة عامة على الأداء المدفوع</h3>
+                    <span class="card-subtitle" data-i18n="cardPaidOverviewSub">المقاييس الإجمالية للحساب الإعلاني (ميتا)</span>
+                </div>
+                <div class="table-responsive">
+                    <table id="table-paid-performance">
+                        <thead>
+                            <tr>
+                                <th data-i18n="thMetric">المؤشر</th>
+                                <th data-i18n="thReach">الوصول</th>
+                                <th data-i18n="thImpressions">الظهور</th>
+                                <th data-i18n="thFrequency">التكرار</th>
+                                <th data-i18n="thCpm">CPM</th>
+                                <th data-i18n="thCpc">CPC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loaded from JSON -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 2: PAID ADS DETAIL -->
+        <h2 class="tab-title-print" data-i18n="printPaid">🎯 التحليل التفصيلي للحملات المدفوعة</h2>
+        <div id="tab-paid" class="tab-content">
+            <!-- Campaign 1: First Ad Month 6 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" data-i18n="cardFirstAdTitle">حملة "First Ad Month 6" (الهدف: بدء محادثات / ليدز)</h3>
+                    <span class="card-subtitle" data-i18n="cardFirstAdSub">الحملة الأهم لتوليد الفرص العقارية الفعلية</span>
+                </div>
+                <div id="first-ad-intro">
+                    <!-- Text loaded from JSON -->
+                </div>
+                
+                <div class="content-grid content-grid-2" style="margin-top: 1.5rem;">
+                    <div>
+                        <h4 style="margin-bottom: 0.8rem; font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;" data-i18n="cardCreativeCompare">مقارنة التصاميم الإعلانية (Creative)</h4>
+                        <div class="table-responsive">
+                            <table id="table-first-ad-creatives">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="thCreative">الكرييتيف</th>
+                                        <th data-i18n="thSpend">الإنفاق</th>
+                                        <th data-i18n="thConvs">عدد المحادثات</th>
+                                        <th data-i18n="thCostConv">تكلفة المحادثة</th>
+                                        <th data-i18n="thCtr">CTR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loaded from JSON -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="creativeComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid content-grid-2" style="margin-top: 2rem;">
+                    <div>
+                        <h4 style="margin-bottom: 0.8rem; font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;" data-i18n="cardAgeLeadsTitle">الأداء بحسب الفئة العمرية</h4>
+                        <div class="table-responsive">
+                            <table id="table-first-ad-age">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="thAge">العمر</th>
+                                        <th data-i18n="thSpend">الإنفاق</th>
+                                        <th data-i18n="thConvs">المحادثات</th>
+                                        <th data-i18n="thCostConv">تكلفة المحادثة</th>
+                                        <th data-i18n="thEvaluation">التقييم</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loaded from JSON -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="agePerformanceLeadsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign 2: Engagement Ad -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" data-i18n="cardEngagementAdTitle">حملة "Engagement Ad" (الهدف: تفاعل / لايكات)</h3>
+                    <span class="card-subtitle" data-i18n="cardEngagementAdSub">الوصول السريع وتكلفة التفاعل المنخفضة</span>
+                </div>
+                <div id="engagement-ad-intro">
+                    <!-- Text loaded from JSON -->
+                </div>
+
+                <div class="content-grid content-grid-2" style="margin-top: 1.5rem;">
+                    <div>
+                        <h4 style="margin-bottom: 0.8rem; font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;" data-i18n="cardFragTitle">تحليل تشتت الميزانية (Fragmentation)</h4>
+                        <div class="table-responsive">
+                            <table id="table-engagement-fragmentation">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="thCreative">الكرييتيف</th>
+                                        <th data-i18n="thSpend">الإنفاق</th>
+                                        <th data-i18n="thLikes">اللايكات</th>
+                                        <th data-i18n="thCostLike">تكلفة اللايك</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loaded from JSON -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="engagementFragmentationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid content-grid-2" style="margin-top: 2rem;">
+                    <div>
+                        <h4 style="margin-bottom: 0.8rem; font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;" data-i18n="cardAgeLikesTitle">الأداء بحسب الفئة العمرية</h4>
+                        <div class="table-responsive">
+                            <table id="table-engagement-age">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="thAge">العمر</th>
+                                        <th data-i18n="thSpend">الإنفاق</th>
+                                        <th data-i18n="thLikes">اللايكات</th>
+                                        <th data-i18n="thCostLike">تكلفة اللايك</th>
+                                        <th data-i18n="thEvaluation">التقييم</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loaded from JSON -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="agePerformanceLikesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 3: ORGANIC GROWTH -->
+        <h2 class="tab-title-print" data-i18n="printOrganic">📱 الأداء العضوي وصفحة فيسبوك</h2>
+        <div id="tab-organic" class="tab-content">
+            <div class="content-grid content-grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardOrganicViewsTitle">تفاعل ومشاهدات المحتوى العضوي</h3>
+                        <span class="card-subtitle" data-i18n="cardOrganicViewsSub">النمو العام لآخر 28 يوماً</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="table-organic-summary">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="thMetric">المؤشر</th>
+                                    <th data-i18n="thValue">القيمة</th>
+                                    <th data-i18n="thGrowthRate">نسبة النمو</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded from JSON -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardContentTypeTitle">تأثير نوع المحتوى</h3>
+                        <span class="card-subtitle" data-i18n="cardContentTypeSub">مقارنة المشاهدات والتفاعل حسب نوع المنشور</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="contentTypeBreakdownChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid content-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardContentTypeShare">توزيع نوع المحتوى</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="table-organic-content-type">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="thContentType">نوع المحتوى</th>
+                                    <th data-i18n="thViewsShare">نسبة المشاهدات</th>
+                                    <th data-i18n="thEngShare">نسبة التفاعل</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded from JSON -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardEngagementNature">طبيعة وتفاعل الجمهور</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="table-organic-engagement-nature">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="thEngType">نوع التفاعل</th>
+                                    <th data-i18n="thCount">العدد</th>
+                                    <th data-i18n="thShareTotal">النسبة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded from JSON -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardEngagementNatureShare">توزيع طبيعة التفاعلات</h3>
+                    </div>
+                    <div class="chart-container" style="height: 180px;">
+                        <canvas id="engagementNatureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid content-grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardFollowersSource">مصادر اكتساب المتابعين الجدد</h3>
+                        <span class="card-subtitle" data-i18n="cardFollowersSourceSub">من أين يأتي المتابعون؟</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="followersSourceChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardReelCloseup">لقطة مقرّبة لـ Reel فردي مميز</h3>
+                        <span class="card-subtitle" data-i18n="cardReelCloseupSub">ميزانية 50 د.إ (أنفق 23.45 د.إ حتى وقت المراجعة)</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="table-reel-closeup" style="font-size: 0.8rem;">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="thViews">المشاهدات</th>
+                                    <th data-i18n="thReach">الوصول</th>
+                                    <th data-i18n="thPlays3s">تشغيل 3ث</th>
+                                    <th data-i18n="thLinkClicks">نقرات الرابط</th>
+                                    <th data-i18n="thProfileVisits">زيارات بروفايل</th>
+                                    <th data-i18n="thFollows">متابعات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded from JSON -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);" id="reel-closeup-note">
+                        <!-- Loaded from JSON -->
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 4: ANALYSIS -->
+        <h2 class="tab-title-print" data-i18n="printAnalysis">🔍 التحليل الاستراتيجي (نقاط القوة والضعف)</h2>
+        <div id="tab-analysis" class="tab-content">
+            <div class="card card-strength">
+                <div class="card-header">
+                    <h3 class="card-title" style="color: var(--accent-green);">
+                        <svg viewBox="0 0 24 24" style="fill: var(--accent-green);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        <span data-i18n="cardStrengthsTitle">نقاط القوة (Strengths)</span>
+                    </h3>
+                </div>
+                <div class="strengths-grid" id="strengths-container">
+                    <!-- Loaded from JSON -->
+                </div>
+            </div>
+
+            <div class="card card-weakness">
+                <div class="card-header">
+                    <h3 class="card-title" style="color: var(--accent-red);">
+                        <svg viewBox="0 0 24 24" style="fill: var(--accent-red);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <span data-i18n="cardWeaknessesTitle">نقاط الضعف والمخاطر (Weaknesses)</span>
+                    </h3>
+                </div>
+                <div class="weaknesses-grid" id="weaknesses-container">
+                    <!-- Loaded from JSON -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 5: ROADMAP -->
+        <h2 class="tab-title-print" data-i18n="printRoadmap">🚀 خطة العمل والتوصيات القادمة</h2>
+        <div id="tab-roadmap" class="tab-content">
+            <div class="content-grid content-grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardImmediateActions">إجراءات فورية (خلال أسبوعين)</h3>
+                        <span class="card-subtitle" data-i18n="cardImmediateActionsSub">خطوات عاجلة لوقف الهدر وتحسين الكفاءة</span>
+                    </div>
+                    <ul class="checklist" id="immediate-actions-container">
+                        <!-- Loaded from JSON -->
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="cardMediumTermActions">خطوات متوسطة المدى (1 - 3 أشهر)</h3>
+                        <span class="card-subtitle" data-i18n="cardMediumTermActionsSub">بناء وتوسيع النظام التسويقي</span>
+                    </div>
+                    <ul class="checklist" id="medium-term-actions-container">
+                        <!-- Loaded from JSON -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" data-i18n="cardWeeklyKpiTitle">مؤشرات الأداء الواجب متابعتها أسبوعياً (Weekly KPIs)</h3>
+                    <span class="card-subtitle" data-i18n="cardWeeklyKpiSub">المقاييس التي تحكم النجاح الفعلي للحملات العقارية</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="thKpi">المؤشر المرجعي</th>
+                                <th data-i18n="thKpiDesc">وصف المؤشر والهدف</th>
+                                <th data-i18n="thKpiPriority">مستوى الأولوية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kpis-container">
+                            <!-- Loaded from JSON -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card card-conclusion">
+                <div class="card-header">
+                    <h3 class="card-title" style="color: var(--primary);" data-i18n="cardConclusionTitle">٧. الخلاصة</h3>
+                </div>
+                <div id="conclusion-text">
+                    <!-- Loaded from JSON -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilingual Data Injection Script -->
+    <script id="dashboard-data" type="application/json">
+        {
+    "ar": {
+        "executiveSummary": "<p style='margin-bottom: 1rem;'>خلال الفترة من 1 إلى 21 يونيو 2026، تم تشغيل حملتين إعلانيتين مموّلتين على ميتا بميزانية إجمالية متواضعة جداً قدرها 241.49 د.إ (بمعدل يومي لا يتجاوز ~11.5 د.إ)، إلى جانب نشاط عضوي ملحوظ على صفحة فيسبوك. النتائج الأولية مشجّعة من حيث التكلفة، لكن حجم الإنفاق الحالي أصغر من أن يسمح باستخلاص نتائج إحصائية قاطعة — وهذه نقطة مهمة يجب وضعها في الاعتبار عند قراءة كل الأرقام بالأسفل.</p><p style='margin-bottom: 1rem;'>أهم استنتاج: حملة “First Ad Month 6” هي الحملة الوحيدة التي تُنتج نشاطاً قريباً من ليدز عقارية حقيقية (بدء محادثة)، بينما حملة “Engagement Ad” رخيصة جداً في التكلفة لكنها تُحسَّن على “لايكات فيسبوك” فقط — وهو مقياس لا يبيع شقق ولا يحجز معاينات بشكل مباشر. التفاصيل والتوصيات الكاملة في الأقسام التالية.</p>",
+        "firstAdIntro": "<p style='margin-bottom: 0.8rem;'>هذه الحملة هي الأقرب لتوليد ليدز عقارية فعلية، حيث تُحسَّن إعلاناتها على “بدء محادثة Messenger”. أنفقت 156.99 د.إ على 4,288 ظهور، وحقّقت 30 محادثة بمتوسط تكلفة 5.23 د.إ للمحادثة — رقم تنافسي جداً لسوق العقارات في الإمارات.</p><p style='margin-bottom: 0.8rem;'>ملاحظة:  تصميم الكاروسيل أرخص بنسبة 34% تقريباً في تكلفة المحادثة الواحدة، ومعدل النقر فيه أعلى بـ5.6 مرة من الصورة الثابتة. هذه إشارة واضحة وقوية رغم صغر العينة.</p><p style='margin-bottom: 0.8rem;'>* عينة صغيرة جداً (إنفاق أقل من 10 د.إ) — اتجاه واعد يحتاج تأكيد بميزانية أكبر، وليس قراراً نهائياً بعد.</p><p style='margin-bottom: 0.8rem;'>تكلفة المحادثة الواحدة بحسب الفئة العمرية — الأخضر جيد، الأحمر ضعيف</p>",
+        "engagementAdIntro": "<p style='margin-bottom: 0.8rem;'>أنفقت هذه الحملة 84.50 د.إ على 2,616 ظهور وحقّقت 177 لايك بمتوسط تكلفة 0.48 د.إ فقط — تكلفة رخيصة جداً، لكن “لايك فيسبوك” مقياس سطحي لا يرتبط مباشرة بقرار شراء أو معاينة عقار.</p><p style='margin-bottom: 0.8rem;'>تحذير:  الميزانية موزّعة على 7 نسخ كرييتيف مختلفة، بعضها أنفق أقل من 1 د.إ فقط — وهذا لا يكفي لتعلّم خوارزمية ميتا ولا لاستخلاص أي نتيجة، ويُهدر جزءاً من الميزانية على نسخ لن تُستخدم أبداً في اتخاذ قرار.</p>",
+        "strengths": [
+            "تكلفة تنافسية جداً مقارنة بمتوسط سوق العقارات في الإمارات: CPM بمتوسط 34.98 د.إ، وتكلفة محادثة لدى الحملة الرئيسية 5.23 د.إ.",
+            "كرييتيف الكاروسيل يتفوّق بوضوح على الصورة الثابتة (تكلفة أقل بـ34%، نقر أعلى بـ5.6 مرة) — إشارة واضحة على نوع المحتوى الذي يناسب الجمهور.",
+            "انتشار عضوي قوي وغير مكلَّف: 80% من التفاعل عبر المشاركات، و98.3% من مشاهدات الفيديو تأتي من غير المتابعين — يعني المحتوى يصل لجمهور جديد مجاناً.",
+            "نمو متابعين صحي ومتسارع (من قاعدة شبه صفرية إلى 189 متابعاً) يدل على أن الصفحة بدأت تكتسب ثقة فعلية في السوق.",
+            "اهتمام موزّع على شرائح عمرية متعددة (من 18 إلى 65+) لا يقتصر على فئة ضيقة — يعني وجود سوق واسع محتمل للتوسّع لاحقاً.",
+            "صيغة Reel تحقق نسبة تفاعل (57.1%) أعلى من نسبتها في المشاهدات (37.3%) — أي أنها “تُقنع” الجمهور بالتفاعل أكثر من نسبة ظهورها."
+        ],
+        "weaknesses": [
+            "الميزانية الإجمالية صغيرة جداً (~11.5 د.إ/يوم) — لا تكفي لإخراج الحملات من “مرحلة التعلّم” في خوارزمية ميتا، وتجعل كل الأرقام أعلاه اتجاهات مبدئية لا نتائج مؤكدة إحصائياً.",
+            "حملة “Engagement Ad” مُحسَّنة على “لايكات فيسبوك” فقط — مقياس لا يقود مباشرة لزيارة معاينة أو حجز عقار، وقد يُعطي شعوراً مضللاً بالنجاح بسبب رخص تكلفته.",
+            "تشتت ميزانية حملة Engagement على 7 نسخ كرييتيف مختلفة، بعضها أنفق أقل من 1 د.إ — هذا لا يكفي للتعلّم ويُهدر جزءاً من الميزانية على متغيّرات لن تُستخدم في أي قرار.",
+            "الكرييتيف الثابت (غير الكاروسيل) في حملة الليدز أقل كفاءة بشكل واضح (تكلفة أعلى 50%) ومع ذلك لا يزال يستهلك ميزانية موازية للكاروسيل الأفضل.",
+            "الفئة العمرية 45-54 في حملة الليدز ضعيفة جداً (تكلفة محادثة 12.62 د.إ — أعلى من باقي الفئات بفارق كبير).",
+            "وجود شريحة “عمر غير معروف” استهلكت 2.49 د.إ بدون أي نتيجة (هدر بسيط لكنه قابل للتلافي).",
+            "لا يوجد ربط واضح بين “بدء محادثة” والنتيجة التجارية الفعلية (ليد مؤهل / حجز معاينة / بيع) — البيانات المتاحة كلها من إدارة الإعلانات فقط دون متابعة من فريق المبيعات.",
+            "الاعتماد شبه الكامل على محادثات Messenger المفتوحة دون نموذج تسجيل بيانات (الاسم / الهاتف / الموازنة / نوع الوحدة) يجعل تأهيل الليدز يدوياً وغير منظم."
+        ],
+        "immediateActions": [
+            "إيقاف الكرييتيف الثابت في حملة “First Ad Month 6” بالكامل، وتحويل ميزانيته بالكامل إلى نسخة الكاروسيل الأفضل أداءً.",
+            "تجميع حملة Engagement: الاحتفاظ بنسخة “Engagement Ad 7” وأفضل نسخة أو نسختين فقط، وإيقاف باقي النسخ المتشتتة فوراً.",
+            "تغيير هدف حملة Engagement من “تفاعل” إلى “محادثات / ليدز” — التفاعل الرخيص لا يبني محفظة عملاء عقارية.",
+            "إنشاء نموذج تسجيل سريع (Instant Form) أو صفحة هبوط بسيطة تجمع: الاسم، رقم الهاتف، الموازنة التقريبية، نوع الوحدة المطلوبة — لتقليل الاعتماد الكامل على محادثة Messenger المفتوحة.",
+            "استثناء أو تقليل استهداف الفئة العمرية 45-54 في حملة الليدز مؤقتاً، أو تجربتها بكرييتيف/عرض مختلف قبل الحكم النهائي عليها."
+        ],
+        "mediumTermActions": [
+            "زيادة الميزانية اليومية تدريجياً إلى مستوى يسمح بخروج الحملات من مرحلة التعلّم (يفضَّل ألا تقل الميزانية اليومية الإجمالية عن 50–80 د.إ كحد أدنى عملي لحملتين نشطتين، حسب الموازنة المتاحة لدى العميل).",
+            "إنشاء ملف تتبّع (جدول بيانات أو CRM بسيط) يسجّل كل محادثة: هل تحوّلت إلى ليد مؤهل؟ هل تم حجز معاينة؟ هل تم البيع؟ — لحساب “تكلفة الليد المؤهل” و“تكلفة المعاينة” وهما المقياسان الحقيقيان لنجاح حملة عقارية.",
+            "تفعيل تقسيمات إضافية (Breakdown) بحسب الجنس والموضع الإعلاني (Feed / Stories / Reels) بعد زيادة الميزانية لتوفير عيّنة كافية للتحليل.",
+            "بناء حملة Retargeting لمن شاهدوا الفيديو 3 ثوانٍ فأكثر أو زاروا البروفايل ولم يبدؤوا محادثة — هذا الجمهور “دافئ” وتكلفة الوصول إليه أقل بكثير.",
+            "إنشاء جمهور مشابه (Lookalike) من قاعدة من بدأوا محادثات بعد توفّر عدد كافٍ من البيانات (يُفضَّل 50 حدثاً فأكثر).",
+            "اختبار زوايا إعلانية مختلفة لمحتوى الفيديو (السعر، نمط الحياة، الإلحاح/العرض المحدود) بالاستفادة من معدل المشاركة المرتفع الحالي في محتوى Reel العضوي."
+        ],
+        "conclusion": "<div class='conclusion-box'><strong>💡 توصية زمنية:  يُفضَّل عدم اتخاذ قرارات كبيرة بخصوص رفع الميزانية أو إيقاف شرائح كاملة قبل مرور 4-6 أسابيع على الأقل من البيانات المجمَّعة بعد التعديلات أعلاه، لإعطاء خوارزمية ميتا وقتاً كافياً للتعلّم.</strong></div><p style='margin-bottom: 1rem;'>النتائج الحالية تمثّل بداية واعدة وليست حكماً نهائياً: التكلفة منخفضة، الانتشار العضوي قوي، واهتمام السوق موجود بوضوح. الفجوة الحقيقية ليست في جذب الانتباه، بل في تحويل هذا الانتباه إلى محادثات مؤهلة قابلة للتتبّع حتى البيع. التركيز خلال الفترة القادمة يجب أن يكون على: تنظيف الكرييتيف الضعيف، تصحيح هدف حملة Engagement، إضافة نموذج تسجيل بيانات، وربط كل ليد برحلته الكاملة حتى الحجز أو البيع — وعندها فقط يمكن قياس عائد الإنفاق الإعلاني (ROAS) بشكل حقيقي يخدم قرارات العميل العقارية.</p>",
+        "campaignsSummaryTable": [
+            [
+                "First Ad Month 6",
+                "محادثات (ليدز)",
+                "156.99 د.إ",
+                "30 محادثة",
+                "5.23 د.إ"
+            ],
+            [
+                "Engagement Ad",
+                "تفاعل (لايكات)",
+                "84.50 د.إ",
+                "177 لايك",
+                "0.48 د.إ"
+            ]
+        ],
+        "paidPerformanceTable": [
+            [
+                "الإجمالي الكلي",
+                "4,202",
+                "6,904",
+                "1.73",
+                "34.98 د.إ",
+                "9.66 د.إ"
+            ]
+        ],
+        "organicSummaryTable": [
+            [
+                "المشاهدات (Views)",
+                "10,056",
+                "+1,543%"
+            ],
+            [
+                "التفاعل (Engagement)",
+                "432",
+                "+222.4%"
+            ],
+            [
+                "المتابعون (Followers)",
+                "189",
+                "+2,600%"
+            ]
+        ],
+        "creativeComparisonTable": [
+            [
+                "كاروسيل (Carousel)",
+                "107.63 د.إ",
+                "23",
+                "4.68 د.إ",
+                "0.90%"
+            ],
+            [
+                "صورة ثابتة",
+                "49.36 د.إ",
+                "7",
+                "7.05 د.إ",
+                "0.16%"
+            ]
+        ],
+        "ageLeadsTable": [
+            [
+                "65+",
+                "1.99 د.إ",
+                "2",
+                "1.00 د.إ",
+                "ممتاز*"
+            ],
+            [
+                "55-64",
+                "9.03 د.إ",
+                "4",
+                "2.26 د.إ",
+                "جيد جداً*"
+            ],
+            [
+                "35-44",
+                "60.20 د.إ",
+                "13",
+                "4.63 د.إ",
+                "الأفضل حجماً"
+            ],
+            [
+                "25-34",
+                "58.04 د.إ",
+                "9",
+                "6.45 د.إ",
+                "متوسط"
+            ],
+            [
+                "45-54",
+                "25.24 د.إ",
+                "2",
+                "12.62 د.إ",
+                "ضعيف"
+            ],
+            [
+                "غير معروف",
+                "2.49 د.إ",
+                "0",
+                "—",
+                "هدر"
+            ]
+        ],
+        "engagementFragmentationTable": [
+            [
+                "Engagement Ad 7 (الرئيسي)",
+                "59.70 د.إ (70.6%)",
+                "114 (64.4%)",
+                "0.52 د.إ"
+            ],
+            [
+                "باقي الـ 6 نسخ مجتمعة",
+                "24.80 د.إ (29.4%)",
+                "63 (35.6%)",
+                "0.39 د.إ (متوسط)"
+            ]
+        ],
+        "ageLikesTable": [
+            [
+                "55-64",
+                "4.15 د.إ",
+                "14",
+                "0.30 د.إ",
+                "الأفضل"
+            ],
+            [
+                "35-44",
+                "30.28 د.إ",
+                "65",
+                "0.47 د.إ",
+                "الأعلى حجماً"
+            ],
+            [
+                "45-54",
+                "13.98 د.إ",
+                "30",
+                "0.47 د.إ",
+                "جيد"
+            ],
+            [
+                "18-24",
+                "7.02 د.إ",
+                "14",
+                "0.50 د.إ",
+                "مقبول"
+            ],
+            [
+                "25-34",
+                "25.93 د.إ",
+                "49",
+                "0.53 د.إ",
+                "مقبول"
+            ],
+            [
+                "65+",
+                "3.14 د.إ",
+                "5",
+                "0.63 د.إ",
+                "الأضعف (عينة صغيرة)"
+            ]
+        ],
+        "organicContentTypeTable": [
+            [
+                "Reel",
+                "37.3%",
+                "57.1%"
+            ],
+            [
+                "Link",
+                "60.5%",
+                "14.8%"
+            ],
+            [
+                "Photo",
+                "1.4%",
+                "14.2%"
+            ],
+            [
+                "أخرى",
+                "0.9%",
+                "13.9%"
+            ]
+        ],
+        "organicEngagementNatureTable": [
+            [
+                "مشاركات (Shares)",
+                "243",
+                "80.2%"
+            ],
+            [
+                "تفاعلات (Reactions)",
+                "57",
+                "18.8%"
+            ],
+            [
+                "تعليقات (Comments)",
+                "3",
+                "1.0%"
+            ]
+        ],
+        "followersSourceTable": [
+            [
+                "Feed",
+                "Groups",
+                "Reels",
+                "صفحتك",
+                "Stories",
+                "غير متاح (Unavailable)"
+            ],
+            [
+                "19.6%",
+                "16.0%",
+                "14.8%",
+                "2.0%",
+                "0.0%",
+                "47.6%"
+            ]
+        ],
+        "reelCloseupTable": [
+            [
+                "1,402",
+                "1,040",
+                "344",
+                "49",
+                "48",
+                "5"
+            ]
+        ],
+        "weeklyKPIs": [
+            [
+                "تكلفة الليد المؤهل (Cost per Qualified Lead)",
+                "مقارنة تكلفة المحادثة الكلية مقابل الليدز الذين تم تأهيلهم فعلياً عبر المبيعات.",
+                "مرتفع جداً"
+            ],
+            [
+                "تكلفة حجز المعاينة (Cost per Site Visit)",
+                "المؤشر الحقيقي لاهتمام العميل وجديته في الشراء.",
+                "مرتفع"
+            ],
+            [
+                "معدل التكرار (Frequency)",
+                "مراقبة تكرار الإعلان لتجنب إجهاد الإعلان (Ad Fatigue) مبكراً.",
+                "متوسط"
+            ],
+            [
+                "معدل التشغيل لأول 3 ثوانٍ (Hook Rate)",
+                "لقياس قوة وجاذبية الفيديوهات والـ Reels الإعلانية.",
+                "متوسط"
+            ],
+            [
+                "نمو المتابعين والوصول العضوي",
+                "متابعة مصادر نمو الصفحة والاستفادة من خوارزميات الـ Reels المجانية.",
+                "متوسط"
+            ]
+        ]
+    },
+    "en": {
+        "executiveSummary": "<p style='margin-bottom: 1rem;'>During the period from June 1 to 21, 2026, two paid advertising campaigns were run on Meta with a very modest total budget of 241.49 AED (with a daily rate not exceeding ~11.5 AED), along with significant organic activity on the Facebook page. The preliminary results are encouraging in terms of cost, but the current spending volume is too small to draw definitive statistical conclusions — a key point to keep in mind when reading all the numbers below.</p><p style='margin-bottom: 1rem;'>Key Conclusion: The 'First Ad Month 6' campaign is the only one producing activity close to real real estate leads (starting a conversation), while the 'Engagement Ad' campaign is very cheap in cost but optimizes for 'Facebook page likes' only — a metric that does not sell apartments or book viewings directly. Full details and recommendations are in the following sections.</p>",
+        "firstAdIntro": "<p style='margin-bottom: 0.8rem;'>This campaign is closest to generating actual real estate leads, as its ads are optimized for 'Starting a Messenger conversation'. It spent 156.99 AED on 4,288 impressions, and achieved 30 conversations at an average cost of 5.23 AED per conversation — a very competitive figure for the UAE real estate market.</p><p style='margin-bottom: 0.8rem;'>Note: The Carousel design is about 34% cheaper in cost per conversation, and its click-through rate (CTR) is 5.6 times higher than the single image. This is a clear and strong signal despite the small sample size.</p><p style='margin-bottom: 0.8rem;'>* Very small sample (spend less than 10 AED) — a promising trend that needs confirmation with a larger budget, not a final decision yet.</p><p style='margin-bottom: 0.8rem;'>Cost per conversation by age group — Green is good, Red is weak</p>",
+        "engagementAdIntro": "<p style='margin-bottom: 0.8rem;'>This campaign spent 84.50 AED on 2,616 impressions and achieved 177 page likes at an average cost of only 0.48 AED — very cheap, but a Facebook 'page like' is a vanity metric that does not correlate directly with purchasing or viewing a property.</p><p style='margin-bottom: 0.8rem;'>Warning: The budget is distributed across 7 different creative versions, some of which spent less than 1 AED — this is not enough for the Meta algorithm to learn or to draw any conclusion, and wastes part of the budget on versions that will never be used to make a decision.</p>",
+        "strengths": [
+            "Highly competitive cost compared to the UAE real estate market average: average CPM is 34.98 AED, and the cost per conversation for the main campaign is 5.23 AED.",
+            "Carousel creative clearly outperforms single image (cost is 34% lower, click-through rate is 5.6 times higher) — a clear indicator of the content type that suits the audience.",
+            "Strong and cost-free organic reach: 80% of engagement is through shares, and 98.3% of video views come from non-followers — meaning the content reaches a new audience for free.",
+            "Healthy and accelerated follower growth (from near zero to 189 followers) indicates the page has started gaining real trust in the market.",
+            "Interest distributed across multiple age groups (from 18 to 65+) and not limited to a narrow segment — meaning a wide potential market for future expansion.",
+            "Reels format achieves an engagement rate (57.1%) higher than its views share (37.3%) — meaning it is more effective at convincing the audience to engage."
+        ],
+        "weaknesses": [
+            "The total budget is very small (~11.5 AED/day) — not enough to exit campaigns from the Meta algorithm's 'learning phase,' making all the above figures preliminary trends rather than statistically confirmed results.",
+            "The 'Engagement Ad' campaign is optimized for 'Facebook likes' only — a metric that does not lead directly to a viewing visit or property booking, and may give a misleading sense of success due to its cheap cost.",
+            "Dispersion of the Engagement campaign budget across 7 different creative versions, some of which spent less than 1 AED — this is not enough for learning and wastes part of the budget on variables that will not be used in any decision.",
+            "The single image creative in the leads campaign is clearly less efficient (cost is 50% higher) yet still consumes a budget parallel to the better-performing carousel.",
+            "The 45-54 age group in the leads campaign is very weak (cost per conversation is 12.62 AED — significantly higher than other groups).",
+            "Presence of an 'Unknown' age segment that consumed 2.49 AED without any result (a minor waste but avoidable).",
+            "No clear link between 'starting a conversation' and the actual business result (qualified lead / booking a viewing / sale) — all available data is from Ads Manager only without sales team follow-up.",
+            "Almost complete reliance on open Messenger conversations without a lead form (Name / Phone / Budget / Unit Type) makes lead qualification manual and disorganized."
+        ],
+        "immediateActions": [
+            "Stop the single image creative in the 'First Ad Month 6' campaign entirely, and transfer its entire budget to the better-performing carousel version.",
+            "Consolidate the Engagement campaign: Keep the 'Engagement Ad 7' version and the best one or two versions only, and stop the remaining dispersed versions immediately.",
+            "Change the objective of the Engagement campaign from 'Engagement' to 'Conversations / Leads' — cheap engagement does not build a real estate client portfolio.",
+            "Create an Instant Form or a simple landing page that collects: Name, Phone Number, Approximate Budget, Required Unit Type — to reduce complete reliance on open Messenger conversations.",
+            "Exclude or reduce targeting of the 45-54 age group in the leads campaign temporarily, or test it with a different creative/offer before making a final judgment."
+        ],
+        "mediumTermActions": [
+            "Gradually increase the daily budget to a level that allows campaigns to exit the learning phase (it is preferred that the total daily budget is not less than 50–80 AED as a practical minimum for two active campaigns, depending on the client's budget).",
+            "Create a tracking sheet (a spreadsheet or a simple CRM) that records every conversation: Did it turn into a qualified lead? Was a viewing booked? Was a sale made? — to calculate 'Cost per Qualified Lead' and 'Cost per Site Visit,' which are the true measures of a real estate campaign's success.",
+            "Activate additional breakdowns by gender and placement (Feed / Stories / Reels) after increasing the budget to provide a sufficient sample for analysis.",
+            "Build a Retargeting campaign for those who watched the video for 3 seconds or more or visited the profile but did not start a conversation — this audience is 'warm' and the cost to reach them is much lower.",
+            "Create a Lookalike audience from the base of those who started conversations after a sufficient amount of data is available (preferably 50 events or more).",
+            "Test different ad angles for the video content (Price, Lifestyle, Urgency/Limited Offer) by leveraging the current high share rate of organic Reels content."
+        ],
+        "conclusion": "<div class='conclusion-box'><strong>💡 Time Recommendation: It is preferred not to make major decisions regarding increasing budget or stopping entire segments before at least 4-6 weeks of accumulated data after the above adjustments, to give the Meta algorithm sufficient time to learn.</strong></div><p style='margin-bottom: 1rem;'>The current results represent a promising start, not a final judgment: costs are low, organic reach is strong, and market interest is clearly present. The real gap is not in attracting attention, but in converting this attention into qualified, trackable conversations up to the sale. The focus during the coming period should be on: cleaning up weak creatives, correcting the objective of the engagement campaign, adding a data registration form, and linking each lead to their entire journey up to booking or sale — only then can the true Return on Ad Spend (ROAS) be measured to serve the client's real estate decisions.</p>",
+        "campaignsSummaryTable": [
+            [
+                "First Ad Month 6",
+                "Conversations (Leads)",
+                "156.99 AED",
+                "30 conversations",
+                "5.23 AED"
+            ],
+            [
+                "Engagement Ad",
+                "Engagement (Likes)",
+                "84.50 AED",
+                "177 likes",
+                "0.48 AED"
+            ]
+        ],
+        "paidPerformanceTable": [
+            [
+                "Grand Total",
+                "4,202",
+                "6,904",
+                "1.73",
+                "34.98 AED",
+                "9.66 AED"
+            ]
+        ],
+        "organicSummaryTable": [
+            [
+                "Views",
+                "10,056",
+                "+1,543%"
+            ],
+            [
+                "Engagement",
+                "432",
+                "+222.4%"
+            ],
+            [
+                "Followers",
+                "189",
+                "+2,600%"
+            ]
+        ],
+        "creativeComparisonTable": [
+            [
+                "Carousel",
+                "107.63 AED",
+                "23",
+                "4.68 AED",
+                "0.90%"
+            ],
+            [
+                "Single Image",
+                "49.36 AED",
+                "7",
+                "7.05 AED",
+                "0.16%"
+            ]
+        ],
+        "ageLeadsTable": [
+            [
+                "65+",
+                "1.99 AED",
+                "2",
+                "1.00 AED",
+                "Excellent*"
+            ],
+            [
+                "55-64",
+                "9.03 AED",
+                "4",
+                "2.26 AED",
+                "Very Good*"
+            ],
+            [
+                "35-44",
+                "60.20 AED",
+                "13",
+                "4.63 AED",
+                "Best by Volume"
+            ],
+            [
+                "25-34",
+                "58.04 AED",
+                "9",
+                "6.45 AED",
+                "Average"
+            ],
+            [
+                "45-54",
+                "25.24 AED",
+                "2",
+                "12.62 AED",
+                "Weak"
+            ],
+            [
+                "Unknown",
+                "2.49 AED",
+                "0",
+                "—",
+                "Waste"
+            ]
+        ],
+        "engagementFragmentationTable": [
+            [
+                "Engagement Ad 7 (Main)",
+                "59.70 AED (70.6%)",
+                "114 (64.4%)",
+                "0.52 AED"
+            ],
+            [
+                "Remaining 6 Versions Combined",
+                "24.80 AED (29.4%)",
+                "63 (35.6%)",
+                "0.39 AED (Avg.)"
+            ]
+        ],
+        "ageLikesTable": [
+            [
+                "55-64",
+                "4.15 AED",
+                "14",
+                "0.30 AED",
+                "Best"
+            ],
+            [
+                "35-44",
+                "30.28 AED",
+                "65",
+                "0.47 AED",
+                "Highest by Volume"
+            ],
+            [
+                "45-54",
+                "13.98 AED",
+                "30",
+                "0.47 AED",
+                "Good"
+            ],
+            [
+                "18-24",
+                "7.02 AED",
+                "14",
+                "0.50 AED",
+                "Acceptable"
+            ],
+            [
+                "25-34",
+                "25.93 AED",
+                "49",
+                "0.53 AED",
+                "Acceptable"
+            ],
+            [
+                "65+",
+                "3.14 AED",
+                "5",
+                "0.63 AED",
+                "Weakest (Small sample)"
+            ]
+        ],
+        "organicContentTypeTable": [
+            [
+                "Reel",
+                "37.3%",
+                "57.1%"
+            ],
+            [
+                "Link",
+                "60.5%",
+                "14.8%"
+            ],
+            [
+                "Photo",
+                "1.4%",
+                "14.2%"
+            ],
+            [
+                "Others",
+                "0.9%",
+                "13.9%"
+            ]
+        ],
+        "organicEngagementNatureTable": [
+            [
+                "Shares",
+                "243",
+                "80.2%"
+            ],
+            [
+                "Reactions",
+                "57",
+                "18.8%"
+            ],
+            [
+                "Comments",
+                "3",
+                "1.0%"
+            ]
+        ],
+        "followersSourceTable": [
+            [
+                "Feed",
+                "Groups",
+                "Reels",
+                "Your Page",
+                "Stories",
+                "Unavailable"
+            ],
+            [
+                "19.6%",
+                "16.0%",
+                "14.8%",
+                "2.0%",
+                "0.0%",
+                "47.6%"
+            ]
+        ],
+        "reelCloseupTable": [
+            [
+                "1,402",
+                "1,040",
+                "344",
+                "49",
+                "48",
+                "5"
+            ]
+        ],
+        "weeklyKPIs": [
+            [
+                "Cost per Qualified Lead",
+                "Comparing overall cost per conversation against leads actually qualified by sales.",
+                "Very High"
+            ],
+            [
+                "Cost per Site Visit",
+                "The true measure of customer interest and seriousness in buying.",
+                "High"
+            ],
+            [
+                "Frequency",
+                "Monitoring ad frequency to avoid early ad fatigue.",
+                "Medium"
+            ],
+            [
+                "Hook Rate (First 3 Seconds Play Rate)",
+                "To measure the strength and appeal of videos and Reels ads.",
+                "Medium"
+            ],
+            [
+                "Followers Growth & Organic Reach",
+                "Tracking page growth sources and leveraging free Reels algorithms.",
+                "Medium"
+            ]
+        ]
+    }
+}
+    </script>
+
+    <!-- UI Logic, Localization and Charts Script -->
+    <script>
+        const i18n = {
+    "ar": {
+        "title": "Five Hills — لوحة تحليل أداء الحملات الإعلانية",
+        "logoTitle": "Five Hills Real Estate — العقارات",
+        "logoSub": "تقرير تحليل أداء التسويق الرقمي | 1 — 21 يونيو 2026",
+        "themeLight": "الوضع المضيء",
+        "themeDark": "الوضع المظلم",
+        "printBtn": "طباعة التقرير / حفظ PDF",
+        "metricSpendTitle": "إجمالي الميزانية المنفقة",
+        "metricSpendSub": "خلال 21 يوماً (بمعدل ~11.5 د.إ يومياً)",
+        "metricSpendUnit": "د.إ",
+        "metricLeadsTitle": "المحادثات المستلمة (Leads)",
+        "metricLeadsSub": "حملة First Ad Month 6",
+        "metricLeadsUnit": "محادثة",
+        "metricViewsTitle": "مشاهدات الصفحة العضوية",
+        "metricViewsSub": "+1,543% نمو بالآخر 28 يوماً",
+        "metricViewsUnit": "مشاهدة",
+        "metricFollowersTitle": "عدد متابعي الصفحة الكلي",
+        "metricFollowersSub": "+2,600% نمو متسارع",
+        "metricFollowersUnit": "متابع",
+        "tabOverview": "📊 الملخص التنفيذي",
+        "tabPaid": "🎯 الحملات المدفوعة",
+        "tabOrganic": "📱 الأداء العضوي",
+        "tabAnalysis": "🔍 نقاط القوة والضعف",
+        "tabRoadmap": "🚀 خطة العمل والتوصيات",
+        "printOverview": "📊 الملخص التنفيذي ونظرة عامة",
+        "printPaid": "🎯 التحليل التفصيلي للحملات المدفوعة",
+        "printOrganic": "📱 الأداء العضوي وصفحة فيسبوك",
+        "printAnalysis": "🔍 التحليل الاستراتيجي (نقاط القوة والضعف)",
+        "printRoadmap": "🚀 خطة العمل والتوصيات القادمة",
+        "cardExecSummary": "الملخص التنفيذي",
+        "cardBudgetShare": "توزيع الميزانية والنتائج",
+        "cardCampaignsSummary": "أداء الحملات الرئيسي",
+        "cardCampaignsSummarySub": "مقارنة سريعة بين أهداف وإنفاق الحملات",
+        "cardPaidOverview": "نظرة عامة على الأداء المدفوع",
+        "cardPaidOverviewSub": "المقاييس الإجمالية للحساب الإعلاني (ميتا)",
+        "cardFirstAdTitle": "حملة \"First Ad Month 6\" (الهدف: بدء محادثات / ليدز)",
+        "cardFirstAdSub": "الحملة الأهم لتوليد الفرص العقارية الفعلية",
+        "cardCreativeCompare": "مقارنة التصاميم الإعلانية (Creative)",
+        "cardAgeLeadsTitle": "الأداء بحسب الفئة العمرية",
+        "cardEngagementAdTitle": "حملة \"Engagement Ad\" (الهدف: تفاعل / لايكات)",
+        "cardEngagementAdSub": "الوصول السريع وتكلفة التفاعل المنخفضة",
+        "cardFragTitle": "تحليل تشتت الميزانية (Fragmentation)",
+        "cardAgeLikesTitle": "الأداء بحسب الفئة العمرية",
+        "cardOrganicViewsTitle": "تفاعل ومشاهدات المحتوى العضوي",
+        "cardOrganicViewsSub": "النمو العام لآخر 28 يوماً",
+        "cardContentTypeTitle": "تأثير نوع المحتوى",
+        "cardContentTypeSub": "مقارنة المشاهدات والتفاعل حسب نوع المنشور",
+        "cardContentTypeShare": "توزيع نوع المحتوى",
+        "cardEngagementNature": "طبيعة وتفاعل الجمهور",
+        "cardEngagementNatureShare": "توزيع طبيعة التفاعلات",
+        "cardFollowersSource": "مصادر اكتساب المتابعين الجدد",
+        "cardFollowersSourceSub": "من أين يأتي المتابعون؟",
+        "cardReelCloseup": "لقطة مقرّبة لـ Reel فردي مميز",
+        "cardReelCloseupSub": "ميزانية 50 د.إ (أنفق 23.45 د.إ حتى وقت المراجعة)",
+        "cardStrengthsTitle": "نقاط القوة (Strengths)",
+        "cardWeaknessesTitle": "نقاط الضعف والمخاطر (Weaknesses)",
+        "cardImmediateActions": "إجراءات فورية (خلال أسبوعين)",
+        "cardImmediateActionsSub": "خطوات عاجلة لوقف الهدر وتحسين الكفاءة",
+        "cardMediumTermActions": "خطوات متوسطة المدى (1 - 3 أشهر)",
+        "cardMediumTermActionsSub": "بناء وتوسيع النظام التسويقي",
+        "cardWeeklyKpiTitle": "مؤشرات الأداء الواجب متابعتها أسبوعياً (Weekly KPIs)",
+        "cardWeeklyKpiSub": "المقاييس التي تحكم النجاح الفعلي للحملات العقارية",
+        "cardConclusionTitle": "٧. الخلاصة",
+        "thCampaign": "الحملة",
+        "thObjective": "الهدف",
+        "thSpend": "الإنفاق",
+        "thResults": "النتائج",
+        "thCostResult": "تكلفة النتيجة",
+        "thMetric": "المؤشر",
+        "thReach": "الوصول",
+        "thImpressions": "الظهور",
+        "thFrequency": "التكرار",
+        "thCpm": "CPM",
+        "thCpc": "CPC",
+        "thValue": "القيمة",
+        "thGrowthRate": "نسبة النمو",
+        "thCreative": "الكرييتيف",
+        "thConvs": "عدد المحادثات",
+        "thCostConv": "تكلفة المحادثة",
+        "thCtr": "CTR",
+        "thAge": "العمر",
+        "thEvaluation": "التقييم",
+        "thLikes": "اللايكات",
+        "thCostLike": "تكلفة اللايك",
+        "thContentType": "نوع المحتوى",
+        "thViewsShare": "نسبة المشاهدات",
+        "thEngShare": "نسبة التفاعل",
+        "thEngType": "نوع التفاعل",
+        "thCount": "العدد",
+        "thShareTotal": "النسبة",
+        "thViews": "المشاهدات",
+        "thPlays3s": "تشغيل 3ث",
+        "thLinkClicks": "نقرات الرابط",
+        "thProfileVisits": "زيارات بروفايل",
+        "thFollows": "متابعات",
+        "thKpi": "المؤشر المرجعي",
+        "thKpiDesc": "وصف المؤشر والهدف",
+        "thKpiPriority": "مستوى الأولوية"
+    },
+    "en": {
+        "title": "Five Hills — Ad Performance Analysis Dashboard",
+        "logoTitle": "Five Hills Real Estate",
+        "logoSub": "Digital Marketing Performance Analysis Report | June 1 — 21, 2026",
+        "themeLight": "Light Mode",
+        "themeDark": "Dark Mode",
+        "printBtn": "Print Report / Save PDF",
+        "metricSpendTitle": "Total Ad Spend",
+        "metricSpendSub": "Over 21 days (average ~11.5 AED daily)",
+        "metricSpendUnit": "AED",
+        "metricLeadsTitle": "Conversations Received (Leads)",
+        "metricLeadsSub": "First Ad Month 6 Campaign",
+        "metricLeadsUnit": "Leads",
+        "metricViewsTitle": "Organic Page Views",
+        "metricViewsSub": "+1,543% growth in last 28 days",
+        "metricViewsUnit": "Views",
+        "metricFollowersTitle": "Total Page Followers",
+        "metricFollowersSub": "+2,600% accelerated growth",
+        "metricFollowersUnit": "Followers",
+        "tabOverview": "📊 Executive Summary",
+        "tabPaid": "🎯 Paid Campaigns",
+        "tabOrganic": "📱 Organic Performance",
+        "tabAnalysis": "🔍 Strengths & Weaknesses",
+        "tabRoadmap": "🚀 Action Plan",
+        "printOverview": "📊 Executive Summary & Overview",
+        "printPaid": "🎯 Detailed Paid Campaigns Analysis",
+        "printOrganic": "📱 Organic Performance & Facebook Page",
+        "printAnalysis": "🔍 Strategic Analysis (Strengths & Weaknesses)",
+        "printRoadmap": "🚀 Action Plan & Recommendations",
+        "cardExecSummary": "Executive Summary",
+        "cardBudgetShare": "Budget & Results Distribution",
+        "cardCampaignsSummary": "Main Campaigns Performance",
+        "cardCampaignsSummarySub": "Quick comparison between campaign objectives and spend",
+        "cardPaidOverview": "Paid Performance Overview",
+        "cardPaidOverviewSub": "Meta Ad Account Overall Metrics",
+        "cardFirstAdTitle": "First Ad Month 6 Campaign (Objective: Start Conversations / Leads)",
+        "cardFirstAdSub": "Main campaign for generating actual real estate leads",
+        "cardCreativeCompare": "Creative Comparison",
+        "cardAgeLeadsTitle": "Performance by Age Group",
+        "cardEngagementAdTitle": "Engagement Ad Campaign (Objective: Engagement / Likes)",
+        "cardEngagementAdSub": "Quick reach and low engagement cost",
+        "cardFragTitle": "Budget Dispersion Analysis (Fragmentation)",
+        "cardAgeLikesTitle": "Performance by Age Group",
+        "cardOrganicViewsTitle": "Organic Content Views & Engagement",
+        "cardOrganicViewsSub": "Overall growth in last 28 days",
+        "cardContentTypeTitle": "Content Type Impact",
+        "cardContentTypeSub": "Views vs. engagement comparison by post type",
+        "cardContentTypeShare": "Content Type Share",
+        "cardEngagementNature": "Audience Engagement Nature",
+        "cardEngagementNatureShare": "Engagement Types Distribution",
+        "cardFollowersSource": "New Follower Acquisition Sources",
+        "cardFollowersSourceSub": "Where do followers come from?",
+        "cardReelCloseup": "Close-up of a Featured Reel Ad",
+        "cardReelCloseupSub": "Budget of 50 AED (Spent 23.45 AED up to review time)",
+        "cardStrengthsTitle": "Strengths",
+        "cardWeaknessesTitle": "Weaknesses & Risks",
+        "cardImmediateActions": "Immediate Actions (Within 2 Weeks)",
+        "cardImmediateActionsSub": "Urgent steps to stop budget waste and improve efficiency",
+        "cardMediumTermActions": "Medium-Term Steps (1 - 3 Months)",
+        "cardMediumTermActionsSub": "Building and expanding the marketing system",
+        "cardWeeklyKpiTitle": "Key Performance Indicators to Monitor Weekly (Weekly KPIs)",
+        "cardWeeklyKpiSub": "Metrics governing the actual success of real estate campaigns",
+        "cardConclusionTitle": "7. Conclusion",
+        "thCampaign": "Campaign",
+        "thObjective": "Objective",
+        "thSpend": "Spend",
+        "thResults": "Results",
+        "thCostResult": "Cost per Result",
+        "thMetric": "Metric",
+        "thReach": "Reach",
+        "thImpressions": "Impressions",
+        "thFrequency": "Frequency",
+        "thCpm": "CPM",
+        "thCpc": "CPC",
+        "thValue": "Value",
+        "thGrowthRate": "Growth Rate",
+        "thCreative": "Creative",
+        "thConvs": "Conversations",
+        "thCostConv": "Cost per Conv.",
+        "thCtr": "CTR",
+        "thAge": "Age",
+        "thEvaluation": "Evaluation",
+        "thLikes": "Likes",
+        "thCostLike": "Cost per Like",
+        "thContentType": "Content Type",
+        "thViewsShare": "Views Share",
+        "thEngShare": "Engagement Share",
+        "thEngType": "Engagement Type",
+        "thCount": "Count",
+        "thShareTotal": "Share",
+        "thViews": "Views",
+        "thPlays3s": "3-Sec Plays",
+        "thLinkClicks": "Link Clicks",
+        "thProfileVisits": "Profile Visits",
+        "thFollows": "Follows",
+        "thKpi": "Benchmark Metric",
+        "thKpiDesc": "Metric Description & Goal",
+        "thKpiPriority": "Priority Level"
+    }
+};
+
+        // Toggle theme (Dark/Light)
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        // Language Toggle Configuration
+        const langToggle = document.getElementById('lang-toggle');
+        const langText = document.getElementById('lang-text');
+        let currentLang = localStorage.getItem('lang') || 'ar';
+        
+        // Parse report data from the script tag
+        const rawData = document.getElementById('dashboard-data').textContent;
+        const fullReportData = JSON.parse(rawData);
+
+        // Global Charts object
+        let charts = {};
+
+        // Tab Navigation setup
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Theme Toggle events
+        themeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeUI();
+            updateChartColors();
+        });
+
+        function updateThemeUI() {
+            if (currentTheme === 'dark') {
+                themeIcon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.32 11.32l.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"></path>';
+                themeText.textContent = i18n[currentLang].themeLight;
+            } else {
+                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+                themeText.textContent = i18n[currentLang].themeDark;
+            }
+        }
+
+        // Language Switch Events
+        langToggle.addEventListener('click', () => {
+            const nextLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguage(nextLang);
+        });
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            
+            // Adjust document layout and lang attribute
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+            
+            // Update Toggle Button Text
+            langText.textContent = lang === 'ar' ? 'English' : 'العربية';
+            
+            // Translate static DOM components
+            translateStaticUI(lang);
+            
+            // Re-render UI elements and dynamic content
+            updateThemeUI();
+            populateDynamicContent(lang);
+            
+            // Rebuild charts
+            destroyCharts();
+            createCharts(lang);
+        }
+
+        function translateStaticUI(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerHTML = i18n[lang][key];
+                }
+            });
+            document.title = i18n[lang].title;
+        }
+
+        function populateDynamicContent(lang) {
+            const data = fullReportData[lang];
+            
+            // Text values
+            document.getElementById('executive-summary-text').innerHTML = data.executiveSummary;
+            document.getElementById('conclusion-text').innerHTML = data.conclusion;
+            document.getElementById('first-ad-intro').innerHTML = data.firstAdIntro;
+            document.getElementById('engagement-ad-intro').innerHTML = data.engagementAdIntro;
+            document.getElementById('reel-closeup-note').innerHTML = data.reelNote;
+            
+            // Clear and populate tables
+            
+            // 1. Campaigns summary table
+            const campaignsTbody = document.querySelector('#table-campaigns-summary tbody');
+            campaignsTbody.innerHTML = '';
+            data.campaignsSummaryTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td>${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                    <td>${row[3]}</td>
+                    <td class="number-outfit"><strong>${row[4]}</strong></td>
+                `;
+                campaignsTbody.appendChild(tr);
+            });
+
+            // 2. Paid Performance Table
+            const paidTbody = document.querySelector('#table-paid-performance tbody');
+            paidTbody.innerHTML = '';
+            data.paidPerformanceTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                    <td class="number-outfit">${row[3]}</td>
+                    <td class="number-outfit">${row[4]}</td>
+                    <td class="number-outfit"><strong>${row[5]}</strong></td>
+                `;
+                paidTbody.appendChild(tr);
+            });
+
+            // 3. Creative Comparison Table
+            const creativesTbody = document.querySelector('#table-first-ad-creatives tbody');
+            creativesTbody.innerHTML = '';
+            data.creativeComparisonTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                    <td class="number-outfit"><strong>${row[3]}</strong></td>
+                    <td class="number-outfit">${row[4]}</td>
+                `;
+                creativesTbody.appendChild(tr);
+            });
+
+            // 4. Age Leads Table
+            const ageLeadTbody = document.querySelector('#table-first-ad-age tbody');
+            ageLeadTbody.innerHTML = '';
+            data.ageLeadsTable.forEach(row => {
+                const tr = document.createElement('tr');
+                let badgeClass = 'badge-yellow';
+                // Color badges based on evaluation text
+                const evalText = row[4].toLowerCase();
+                if (evalText.includes('ممتاز') || evalText.includes('جيد') || evalText.includes('excellent') || evalText.includes('good') || evalText.includes('volume')) {
+                    badgeClass = 'badge-green';
+                }
+                if (evalText.includes('ضعيف') || evalText.includes('هدر') || evalText.includes('weak') || evalText.includes('waste')) {
+                    badgeClass = 'badge-red';
+                }
+                tr.innerHTML = `
+                    <td class="number-outfit"><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                    <td class="number-outfit"><strong>${row[3]}</strong></td>
+                    <td><span class="badge ${badgeClass}">${row[4]}</span></td>
+                `;
+                ageLeadTbody.appendChild(tr);
+            });
+
+            // 5. Engagement Fragmentation
+            const fragTbody = document.querySelector('#table-engagement-fragmentation tbody');
+            fragTbody.innerHTML = '';
+            data.engagementFragmentationTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                    <td class="number-outfit"><strong>${row[3]}</strong></td>
+                `;
+                fragTbody.appendChild(tr);
+            });
+
+            // 6. Age Likes Table
+            const ageLikesTbody = document.querySelector('#table-engagement-age tbody');
+            ageLikesTbody.innerHTML = '';
+            data.ageLikesTable.forEach(row => {
+                const tr = document.createElement('tr');
+                let badgeClass = 'badge-yellow';
+                const evalText = row[4].toLowerCase();
+                if (evalText.includes('الأفضل') || evalText.includes('الأعلى') || evalText.includes('جيد') || evalText.includes('best') || evalText.includes('highest') || evalText.includes('good')) {
+                    badgeClass = 'badge-green';
+                }
+                if (evalText.includes('الأضعف') || evalText.includes('weakest')) {
+                    badgeClass = 'badge-red';
+                }
+                tr.innerHTML = `
+                    <td class="number-outfit"><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                    <td class="number-outfit"><strong>${row[3]}</strong></td>
+                    <td><span class="badge ${badgeClass}">${row[4]}</span></td>
+                `;
+                ageLikesTbody.appendChild(tr);
+            });
+
+            // 7. Organic Summary
+            const organicSummaryTbody = document.querySelector('#table-organic-summary tbody');
+            organicSummaryTbody.innerHTML = '';
+            data.organicSummaryTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit up" style="color: var(--accent-green)"><strong>${row[2]}</strong></td>
+                `;
+                organicSummaryTbody.appendChild(tr);
+            });
+
+            // 8. Organic Content Type
+            const organicContentTypeTbody = document.querySelector('#table-organic-content-type tbody');
+            organicContentTypeTbody.innerHTML = '';
+            data.organicContentTypeTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                `;
+                organicContentTypeTbody.appendChild(tr);
+            });
+
+            // 9. Organic Engagement Nature
+            const organicEngNatureTbody = document.querySelector('#table-organic-engagement-nature tbody');
+            organicEngNatureTbody.innerHTML = '';
+            data.organicEngagementNatureTable.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong></td>
+                    <td class="number-outfit">${row[1]}</td>
+                    <td class="number-outfit">${row[2]}</td>
+                `;
+                organicEngNatureTbody.appendChild(tr);
+            });
+
+            // 10. Reel Closeup
+            const reelCloseupTbody = document.querySelector('#table-reel-closeup tbody');
+            reelCloseupTbody.innerHTML = '';
+            const reelRow = data.reelCloseupTable[0];
+            const trReel = document.createElement('tr');
+            trReel.innerHTML = `
+                <td class="number-outfit">${reelRow[0]}</td>
+                <td class="number-outfit">${reelRow[1]}</td>
+                <td class="number-outfit">${reelRow[2]}</td>
+                <td class="number-outfit"><strong>${reelRow[3]}</strong></td>
+                <td class="number-outfit">${reelRow[4]}</td>
+                <td class="number-outfit"><strong>${reelRow[5]}</strong></td>
+            `;
+            reelCloseupTbody.appendChild(trReel);
+
+            // Populate Strengths
+            const strengthsContainer = document.getElementById('strengths-container');
+            strengthsContainer.innerHTML = '';
+            data.strengths.forEach(point => {
+                const div = document.createElement('div');
+                div.className = 'point-card strength';
+                div.innerHTML = `
+                    <div class="point-icon">✅</div>
+                    <div class="point-text">${point}</div>
+                `;
+                strengthsContainer.appendChild(div);
+            });
+
+            // Populate Weaknesses
+            const weaknessesContainer = document.getElementById('weaknesses-container');
+            weaknessesContainer.innerHTML = '';
+            data.weaknesses.forEach(point => {
+                const div = document.createElement('div');
+                div.className = 'point-card weakness';
+                div.innerHTML = `
+                    <div class="point-icon">⚠️</div>
+                    <div class="point-text">${point}</div>
+                `;
+                weaknessesContainer.appendChild(div);
+            });
+
+            // Populate Immediate Actions
+            const immediateContainer = document.getElementById('immediate-actions-container');
+            immediateContainer.innerHTML = '';
+            data.immediateActions.forEach((action, idx) => {
+                const li = document.createElement('li');
+                li.className = 'checklist-item';
+                li.innerHTML = `
+                    <input type="checkbox" id="imm-${idx}">
+                    <div class="checklist-content">
+                        <label for="imm-${idx}" class="checklist-title" style="cursor: pointer;">${action}</label>
+                    </div>
+                `;
+                immediateContainer.appendChild(li);
+            });
+
+            // Populate Medium Term Actions
+            const mediumContainer = document.getElementById('medium-term-actions-container');
+            mediumContainer.innerHTML = '';
+            data.mediumTermActions.forEach((action, idx) => {
+                const li = document.createElement('li');
+                li.className = 'checklist-item';
+                li.innerHTML = `
+                    <input type="checkbox" id="med-${idx}">
+                    <div class="checklist-content">
+                        <label for="med-${idx}" class="checklist-title" style="cursor: pointer;">${action}</label>
+                    </div>
+                `;
+                mediumContainer.appendChild(li);
+            });
+
+            // Populate Weekly KPIs
+            const kpisContainer = document.getElementById('kpis-container');
+            kpisContainer.innerHTML = '';
+            data.weeklyKPIs.forEach(kpi => {
+                const tr = document.createElement('tr');
+                let badgeClass = 'badge-blue';
+                const priorityText = kpi[2].toLowerCase();
+                if (priorityText.includes('مرتفع') || priorityText.includes('قصوى') || priorityText.includes('high')) {
+                    badgeClass = 'badge-red';
+                }
+                if (priorityText.includes('متوسط') || priorityText.includes('medium')) {
+                    badgeClass = 'badge-yellow';
+                }
+                tr.innerHTML = `
+                    <td><strong>${kpi[0]}</strong></td>
+                    <td>${kpi[1]}</td>
+                    <td><span class="badge ${badgeClass}">${kpi[2]}</span></td>
+                `;
+                kpisContainer.appendChild(tr);
+            });
+        }
+
+        function destroyCharts() {
+            Object.keys(charts).forEach(key => {
+                if (charts[key]) {
+                    charts[key].destroy();
+                }
+            });
+            charts = {};
+        }
+
+        // --- CHART GENERATION ---
+        function createCharts(lang) {
+            const data = fullReportData[lang];
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const labelColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+            const fontColor = isDark ? '#f8fafc' : '#0f172a';
+
+            // Translations helper for chart labels
+            const cTrans = {
+                ar: {
+                    convsLabel: 'عدد المحادثات (ليدز)',
+                    costLabel: 'تكلفة المحادثة (د.إ)',
+                    likeLabel: 'تكلفة التفاعل (لايك)',
+                    viewsLabel: 'نسبة المشاهدات',
+                    engLabel: 'نسبة التفاعل',
+                    acqLabel: 'نسبة اكتساب المتابعين',
+                    c3Title: 'تكلفة المحادثة حسب الفئة العمرية (الأخضر أفضل، الأحمر ضعيف)',
+                    c4Title: 'توزيع ميزانية التفاعل (تشتت كبير)',
+                    c5Title: 'تكلفة اللايك حسب الفئة العمرية (الدرهم)',
+                    currencySuffix: ' د.إ'
+                },
+                en: {
+                    convsLabel: 'No. of Conversations (Leads)',
+                    costLabel: 'Cost per Conversation (AED)',
+                    likeLabel: 'Cost per Like (AED)',
+                    viewsLabel: 'Views Share',
+                    engLabel: 'Engagement Share',
+                    acqLabel: 'Follower Acquisition Share',
+                    c3Title: 'Cost per Conversation by Age Group (Green is Good, Red is Weak)',
+                    c4Title: 'Engagement Budget Distribution (High Dispersion)',
+                    c5Title: 'Cost per Like by Age Group (AED)',
+                    currencySuffix: ' AED'
+                }
+            }[lang];
+
+            // 1. Budget Share Chart (Donut)
+            const ctxBudget = document.getElementById('budgetShareChart').getContext('2d');
+            charts.budget = new Chart(ctxBudget, {
+                type: 'doughnut',
+                data: {
+                    labels: data.campaignsSummaryTable.map(r => r[0]),
+                    datasets: [{
+                        data: data.campaignsSummaryTable.map(r => parseFloat(r[2].replace(/[^\d.]/g, ''))),
+                        backgroundColor: ['#c29b38', '#38bdf8'],
+                        borderColor: isDark ? '#1e293b' : '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit', weight: 'bold' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `  ${context.label}: ${context.raw.toFixed(2)}${cTrans.currencySuffix}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Creative Comparison Chart (Bar)
+            const ctxCreative = document.getElementById('creativeComparisonChart').getContext('2d');
+            const creativeLabels = data.creativeComparisonTable.map(r => r[0]);
+            const creativeLeads = data.creativeComparisonTable.map(r => parseInt(r[2]));
+            const creativeCost = data.creativeComparisonTable.map(r => parseFloat(r[3].replace(/[^\d.]/g, '')));
+
+            charts.creative = new Chart(ctxCreative, {
+                type: 'bar',
+                data: {
+                    labels: creativeLabels,
+                    datasets: [
+                        {
+                            label: cTrans.convsLabel,
+                            data: creativeLeads,
+                            backgroundColor: '#c29b38',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: cTrans.costLabel,
+                            data: creativeCost,
+                            backgroundColor: '#38bdf8',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit' } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: labelColor }, grid: { color: gridColor } },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: lang === 'ar' ? 'المحادثات' : 'Conversations', color: labelColor },
+                            ticks: { color: labelColor },
+                            grid: { color: gridColor }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: lang === 'ar' ? 'التكلفة بالدرهم' : 'Cost in AED', color: labelColor },
+                            ticks: { color: labelColor },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+
+            // 3. Age Performance Leads (Bar)
+            const ctxAgeLeads = document.getElementById('agePerformanceLeadsChart').getContext('2d');
+            const ageLeadsLabels = data.ageLeadsTable.map(r => r[0]);
+            const ageLeadsCost = data.ageLeadsTable.map(r => r[3] === '—' ? 0 : parseFloat(r[3].replace(/[^\d.]/g, '')));
+
+            charts.ageLeads = new Chart(ctxAgeLeads, {
+                type: 'bar',
+                data: {
+                    labels: ageLeadsLabels,
+                    datasets: [
+                        {
+                            label: cTrans.costLabel,
+                            data: ageLeadsCost,
+                            backgroundColor: data.ageLeadsTable.map(r => {
+                                const evalText = r[4].toLowerCase();
+                                if (evalText.includes('ضعيف') || evalText.includes('هدر') || evalText.includes('weak') || evalText.includes('waste')) return '#ef4444';
+                                if (evalText.includes('ممتاز') || evalText.includes('جيد') || evalText.includes('excellent') || evalText.includes('good') || evalText.includes('best')) return '#10b981';
+                                return '#c29b38';
+                            })
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: cTrans.c3Title, color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit', size: 13 } }
+                    },
+                    scales: {
+                        x: { ticks: { color: labelColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: labelColor }, grid: { color: gridColor }, title: { display: true, text: lang === 'ar' ? 'د.إ' : 'AED', color: labelColor } }
+                    }
+                }
+            });
+
+            // 4. Engagement Fragmentation (Pie)
+            const ctxFrag = document.getElementById('engagementFragmentationChart').getContext('2d');
+            charts.frag = new Chart(ctxFrag, {
+                type: 'pie',
+                data: {
+                    labels: data.engagementFragmentationTable.map(r => r[0]),
+                    datasets: [{
+                        data: data.engagementFragmentationTable.map(r => parseFloat(r[1].replace(/[^\d.]/g, ''))),
+                        backgroundColor: ['#0284c7', '#64748b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit' } } },
+                        title: { display: true, text: cTrans.c4Title, color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit', size: 13 } }
+                    }
+                }
+            });
+
+            // 5. Age Performance Likes (Bar)
+            const ctxAgeLikes = document.getElementById('agePerformanceLikesChart').getContext('2d');
+            charts.ageLikes = new Chart(ctxAgeLikes, {
+                type: 'bar',
+                data: {
+                    labels: data.ageLikesTable.map(r => r[0]),
+                    datasets: [{
+                        label: cTrans.likeLabel,
+                        data: data.ageLikesTable.map(r => parseFloat(r[3].replace(/[^\d.]/g, ''))),
+                        backgroundColor: '#0ea5e9'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: cTrans.c5Title, color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit', size: 13 } }
+                    },
+                    scales: {
+                        x: { ticks: { color: labelColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: labelColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+
+            // 6. Organic Content Type Share (Bar Side-by-side)
+            const ctxContent = document.getElementById('contentTypeBreakdownChart').getContext('2d');
+            charts.content = new Chart(ctxContent, {
+                type: 'bar',
+                data: {
+                    labels: data.organicContentTypeTable.map(r => r[0]),
+                    datasets: [
+                        {
+                            label: cTrans.viewsLabel,
+                            data: data.organicContentTypeTable.map(r => parseFloat(r[1].replace(/[^\d.]/g, ''))),
+                            backgroundColor: '#3b82f6'
+                        },
+                        {
+                            label: cTrans.engLabel,
+                            data: data.organicContentTypeTable.map(r => parseFloat(r[2].replace(/[^\d.]/g, ''))),
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit' } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: labelColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: labelColor }, grid: { color: gridColor }, title: { display: true, text: '%', color: labelColor } }
+                    }
+                }
+            });
+
+            // 7. Engagement Nature (Pie)
+            const ctxEngNature = document.getElementById('engagementNatureChart').getContext('2d');
+            charts.engNature = new Chart(ctxEngNature, {
+                type: 'doughnut',
+                data: {
+                    labels: data.organicEngagementNatureTable.map(r => r[0]),
+                    datasets: [{
+                        data: data.organicEngagementNatureTable.map(r => parseInt(r[1])),
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6'],
+                        borderColor: isDark ? '#1e293b' : '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: fontColor, font: { family: lang === 'ar' ? 'Tajawal' : 'Outfit', size: 10 } } }
+                    }
+                }
+            });
+
+            // 8. Followers Source (Horizontal Bar)
+            const ctxFollowers = document.getElementById('followersSourceChart').getContext('2d');
+            charts.followers = new Chart(ctxFollowers, {
+                type: 'bar',
+                data: {
+                    labels: data.followersSourceTable[0],
+                    datasets: [{
+                        label: cTrans.acqLabel,
+                        data: data.followersSourceTable[1].map(v => parseFloat(v.replace(/[^\d.]/g, ''))),
+                        backgroundColor: '#c29b38'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: labelColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: labelColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        function updateChartColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const labelColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+            const fontColor = isDark ? '#f8fafc' : '#0f172a';
+
+            Object.keys(charts).forEach(key => {
+                const chart = charts[key];
+                
+                // Update scales
+                if (chart.options.scales) {
+                    Object.keys(chart.options.scales).forEach(scaleKey => {
+                        const scale = chart.options.scales[scaleKey];
+                        if (scale.ticks) scale.ticks.color = labelColor;
+                        if (scale.grid) scale.grid.color = gridColor;
+                        if (scale.title) scale.title.color = labelColor;
+                    });
+                }
+
+                // Update legends
+                if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                    chart.options.plugins.legend.labels.color = fontColor;
+                }
+
+                // Update title
+                if (chart.options.plugins && chart.options.plugins.title) {
+                    chart.options.plugins.title.color = fontColor;
+                }
+
+                // Update doughnut/pie borders
+                if (chart.config.type === 'doughnut' || chart.config.type === 'pie') {
+                    if (chart.data.datasets[0]) {
+                        chart.data.datasets[0].borderColor = isDark ? '#1e293b' : '#ffffff';
+                    }
+                }
+
+                chart.update();
+            });
+        }
+
+        // Initialize Dashboard on Load
+        window.addEventListener('load', () => {
+            setLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>

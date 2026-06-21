@@ -1,0 +1,6 @@
+# Exclude temporary backup files
+Five_Hills_Dashboard_Backup.html
+
+# Exclude temporary word files
+~$*.docx
+~*.docx
